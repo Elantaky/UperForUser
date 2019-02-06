@@ -142,6 +142,7 @@ public class RegistrationPresenter implements RegistrationInterface.presenter {
         }
     }
 
+
     @Override
     public boolean checkNetworkStatus() {
 

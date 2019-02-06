@@ -4,6 +4,7 @@ import android.content.ComponentName;
 import android.content.DialogInterface;
 import android.content.Intent;
 
+import android.net.Uri;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -12,13 +13,25 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
+import com.squareup.picasso.Picasso;
 import com.zecode.z.uperforuser.R;
 import com.zecode.z.uperforuser.mapPackage.mapView.MapsActivity;
 import com.zecode.z.uperforuser.registrationPackage.registrationInterfaces.RegistrationInterface;
 import com.zecode.z.uperforuser.registrationPackage.registrationPresenter.RegistrationPresenter;
+import com.zecode.z.uperforuser.repositoryPackage.dataHolder.GitHubResponse;
+import com.zecode.z.uperforuser.repositoryPackage.dataHolder.PostToPlaceHolderResponse;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RegistrationActivity extends AppCompatActivity implements RegistrationInterface.View, View.OnClickListener {
     private RegistrationPresenter presenter;
@@ -29,6 +42,10 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
     private EditText emailEditTextSi, passwordEditTextSi,
             emailEditTextRe, passwordEditTextRe, firstNameEditText, phoneNumberEditText, lastNameEditText;
 
+    //training for getting data from gitHub or placeholder
+    private TextView textView;
+    private ImageView imageView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +53,9 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
         presenter = new RegistrationPresenter(this, this);
         initViews();
         presenter.nowNetworkStateShallBeChecked(this);
+
+
+        handlingGithubGetProcess();
     }
 
     private void initViews() {
@@ -62,6 +82,10 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
 
         signinButton.setOnClickListener(this);
         registerButton.setOnClickListener(this);
+
+
+        textView = findViewById(R.id.textView);
+        imageView = findViewById(R.id.imageView);
     }
 
     private AlertDialog getInternetConnectionDialog() {
@@ -110,8 +134,8 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
                                     passwordEditTextSi.getText().toString());
                             if (accountId == null) {
                                 Toast.makeText(RegistrationActivity.this, "wrong data", Toast.LENGTH_SHORT).show();
-                            }else
-                            startActivity(new Intent(RegistrationActivity.this,MapsActivity.class));
+                            } else
+                                startActivity(new Intent(RegistrationActivity.this, MapsActivity.class));
                         } else
                             Toast.makeText(RegistrationActivity.this, "check your internet", Toast.LENGTH_SHORT).show();
                     }
@@ -192,5 +216,58 @@ public class RegistrationActivity extends AppCompatActivity implements Registrat
     protected void onResume() {
         presenter.nowNetworkStateShallBeChecked(this);
         super.onResume();
+    }
+    //training for getting data from gitHub or placeholder
+
+    void handlingGithubGetProcess() {
+        Retrofit retrofit = new Retrofit.Builder().baseUrl("https://jsonplaceholder.typicode.com/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
+        RegistrationInterface.GitHupInterface postResponse = retrofit.create(RegistrationInterface.GitHupInterface.class);
+        Call<PostToPlaceHolderResponse> call = postResponse.getGitHubAccountData("zizo","212",
+                "Section Head","best Employee every year");
+        call.enqueue(new Callback<PostToPlaceHolderResponse>() {
+                         @Override
+                         public void onResponse(Call<PostToPlaceHolderResponse> call, Response<PostToPlaceHolderResponse> response) {
+                             PostToPlaceHolderResponse postToPlaceHolderResponse=response.body();
+                             Toast.makeText(RegistrationActivity.this, postToPlaceHolderResponse.getId() +
+                                     "\n"+postToPlaceHolderResponse.getUserId()+
+                                     "\n"+postToPlaceHolderResponse.getTitle()+
+                                     "\n"+postToPlaceHolderResponse.getBody()
+                                     , Toast.LENGTH_SHORT).show();
+                         }
+
+                         @Override
+                         public void onFailure(Call<PostToPlaceHolderResponse> call, Throwable t) {
+
+                         }
+                     });
+
+/*        RegistrationInterface.GitHupInterface gitHupInterface = retrofit.create(RegistrationInterface.GitHupInterface.class);
+        final Call<GitHubResponse> gitHubAccountData = gitHupInterface.getGitHubAccountData();
+        gitHubAccountData.enqueue(new Callback<GitHubResponse>() {
+            @Override
+            public void onResponse(Call<GitHubResponse> call, Response<GitHubResponse> response) {
+                if (response.isSuccessful()) {
+                    GitHubResponse gitHubResponse = response.body();
+                    String ss = null;
+                    if (gitHubResponse != null) {
+                        ss = gitHubResponse.getAvatar_url();
+                    }
+                    Picasso.get().load(ss).into(imageView);
+                    //Glide.with(RegistrationActivity.this).asBitmap().load(gitHubResponse.getAvatar_url()).into(imageView);
+                    Toast.makeText(RegistrationActivity.this, "success", Toast.LENGTH_SHORT).show();
+                    textView.setText(gitHubResponse.getLogin());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<GitHubResponse> call, Throwable t) {
+                Toast.makeText(RegistrationActivity.this, "fail", Toast.LENGTH_SHORT).show();
+
+            }
+        });*/
+        // end training for getting data from gitHub or placeholder
+
     }
 }

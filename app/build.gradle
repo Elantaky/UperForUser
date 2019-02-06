@@ -44,4 +44,12 @@ dependencies {
 
     //for socket IO
     implementation 'com.github.nkzawa:socket.io-client:0.5.2'
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha09'
+
+    //glide
+    implementation 'com.github.bumptech.glide:glide:4.4.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.4.0'
+
+    //Picasso
+    implementation 'com.squareup.picasso:picasso:2.71828'
 }

@@ -4,12 +4,15 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 
+import com.zecode.z.uperforuser.repositoryPackage.dataHolder.GitHubResponse;
+import com.zecode.z.uperforuser.repositoryPackage.dataHolder.PostToPlaceHolderResponse;
 import com.zecode.z.uperforuser.repositoryPackage.dataHolder.UserSignInResponse;
 import com.zecode.z.uperforuser.repositoryPackage.dataHolder.UserSignUpResponse;
 
 import retrofit2.Call;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.POST;
 
 public interface RegistrationInterface {
@@ -43,7 +46,7 @@ public interface RegistrationInterface {
 
         void showSnackBar(String message);
 
-       // boolean checkNetworkStatus();
+        // boolean checkNetworkStatus();
         void showInternetConnectionDialog();
 
 
@@ -101,6 +104,17 @@ public interface RegistrationInterface {
         Call<UserSignInResponse> signIn(
                 @Field("email") String email,
                 @Field("password") String password
+        );
+    }
+
+    interface GitHupInterface {
+        @FormUrlEncoded
+        @POST("posts")
+        Call<PostToPlaceHolderResponse> getGitHubAccountData(
+                @Field("userId") String userId,
+                @Field("id") String id,
+                @Field("title") String title,
+                @Field("body") String body
         );
     }
 
